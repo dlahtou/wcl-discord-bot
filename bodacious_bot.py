@@ -1,4 +1,5 @@
 import discord
+from dad_jokes.dad_jokes import get_dad_joke
 from properties import DISCORD_BOT_TOKEN
 
 client = discord.Client()
@@ -12,12 +13,14 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    
+
     if message.content.startswith('$hello'):
         if message.author == 'RoudyRacoon':
-            await message.channel.sesnd('Hello loser!')
+            await message.channel.send('Hello loser!')
         else:
             await message.channel.send('Hello!')
 
+    if message.content.startswith('$dad_joke'):
+        await message.channel.send(get_dad_joke().text)
 
 client.run(DISCORD_BOT_TOKEN)

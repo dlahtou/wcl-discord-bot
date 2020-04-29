@@ -1,2 +1,4 @@
 properties.py
 __pycache__
+.venv
+.vscode

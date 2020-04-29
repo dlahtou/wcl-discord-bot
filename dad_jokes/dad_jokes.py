@@ -9,6 +9,7 @@ def get_dad_joke():
         headers={'Accept': 'text/plain'},
         )
     if r.status_code == 200:
-        return r
+        print("Sending dad joke!")
+        return r.text
     else:
         return "Error retrieving dad joke, " + r.status_code

@@ -11,16 +11,21 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == client.user or not message.content.startswith('/'):
         return
-
-    if message.content.startswith('$hello'):
-        if message.author == 'RoudyRacoon':
+    
+    print('{0}: {1}'.format(message.author, message.content))
+ 
+    if message.content.startswith('/hello'):
+        print('Sending hello!')
+        if message.author == 'RoudyRacoon#8007':
             await message.channel.send('Hello loser!')
         else:
             await message.channel.send('Hello!')
+    elif message.content.startswith('/dadjoke'):
+        await message.channel.send(get_dad_joke())
+    else:
+        print('Invalid message, no response sent')
 
-    if message.content.startswith('$dad_joke'):
-        await message.channel.send(get_dad_joke().text)
 
 client.run(DISCORD_BOT_TOKEN)

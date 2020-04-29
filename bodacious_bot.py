@@ -1,4 +1,5 @@
 import discord
+from properties import API_TOKEN
 
 client = discord.Client()
 
@@ -19,4 +20,4 @@ async def on_message(message):
             await message.channel.send('Hello!')
 
 
-client.run('NzA0ODM4MTY5OTA0MDIxNTQ2.Xqi-Yw.LZPS_d9qjRsfcd4e_VHt3P2JvmI')
+client.run(API_TOKEN)

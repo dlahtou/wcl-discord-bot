@@ -1,5 +1,5 @@
 import discord
-from dad_jokes.dad_jokes.py import get_dad_joke()
+from dad_jokes.dad_jokes import get_dad_joke
 from properties import DISCORD_BOT_TOKEN
 
 client = discord.Client()
@@ -21,6 +21,6 @@ async def on_message(message):
             await message.channel.send('Hello!')
 
     if message.content.startswith('$dad_joke'):
-        await message.channel.send(get_dad_joke())
+        await message.channel.send(get_dad_joke().text)
 
 client.run(DISCORD_BOT_TOKEN)

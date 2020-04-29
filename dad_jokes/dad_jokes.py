@@ -12,5 +12,3 @@ def get_dad_joke():
         return r
     else:
         return "Error retrieving dad joke, " + r.status_code
-
-get_dad_joke()

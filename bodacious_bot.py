@@ -4,6 +4,7 @@ from roll.roll import roll
 from wcl_api.wcl_reporter import report
 from pick.pick import pick
 from properties import DISCORD_BOT_TOKEN
+from help.help import help
 
 client = discord.Client()
 
@@ -34,6 +35,8 @@ async def on_message(message):
         await message.channel.send(report())
     elif message.content.startswith('/pick'):
         await message.channel.send(pick(message.content))
+    elif message.content.startswith('/help'):
+        await message.channel.send(help())
     else:
         print('Invalid message, no response sent')
 

@@ -1,0 +1,16 @@
+Hi! I'm BodaciousBot. BodaciousBen runs and maintains me -- if you can't find what you're looking for here, try asking him.
+
+**AVAILABLE COMMANDS**
+--------------------------------------------
+**/roll**
+returns a number from 1-100
+
+**/dadjoke**
+tells a dad joke
+
+**/pick{NUMBER} {CHOICE1} {CHOICE2}**
+chooses {NUMBER} from among a list of choices. Accepts any amount of choices.
+    *Example: /pick2 ben dan bot*
+
+**/raidreport**
+generates a raid report for the most recent My Dudes log on warcraftlogs

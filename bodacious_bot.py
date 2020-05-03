@@ -1,6 +1,7 @@
 import discord
 from dad_jokes.dad_jokes import get_dad_joke
 from roll.roll import roll
+from wcl_api.wcl_reporter import report
 from properties import DISCORD_BOT_TOKEN
 
 client = discord.Client()
@@ -28,6 +29,8 @@ async def on_message(message):
     elif message.content.startswith('/roll'):
         print('Rolling!')
         await message.channel.send(roll())
+    elif message.content.startswith('/raidreport'):
+        await message.channel.send(report())
     else:
         print('Invalid message, no response sent')
 

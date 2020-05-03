@@ -2,12 +2,15 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from wcl_api.models import Parse
+from os import getcwd
+from os.path import join
+from properties import CHROMEDRIVER_EXECUTABLE_NAME
 import time
 
 def get_parses(report, fights):
     options = webdriver.ChromeOptions()
     options.headless = True
-    driver = webdriver.Chrome(executable_path='C:\\chromedriver.exe', options=options)
+    driver = webdriver.Chrome(executable_path=join(getcwd(), CHROMEDRIVER_EXECUTABLE_NAME), options=options)
     parses = []
 
     for fight in fights.kills:

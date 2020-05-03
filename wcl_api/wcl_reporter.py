@@ -4,7 +4,8 @@ from os import getcwd, remove
 import pandas as pd
 from datetime import date
 
-OUT_FOLDER_NAME = 'DudesLogs'
+PARENT_OUT_FOLDER = 'DudesLogs'
+REPORT_FOLDER = 'reports'
 
 def get_report_dataframe(report, fights):
     filename = join(getcwd(), OUT_FOLDER_NAME, report.get_id_string() + '.csv')
@@ -25,32 +26,31 @@ def get_report_dataframe(report, fights):
     return df
 
 def build_report(report, fights, df):
-    filename = join(getcwd(), OUT_FOLDER_NAME, 'test.txt')
-    if  isfile(filename):
-        remove(filename)
-    with open(filename, 'w') as open_file:
-        lines = []
-        lines.append('```')
-        lines.append('{0} {1} {2}'.format(fights.difficulty, report.zone_name, format_date(report.start_time_epoch_millis)))
-        lines.append('============================================')
-        lines.append('Raid Duration: {0}'.format(report.get_formatted_duration()))
-        lines.append('Bosses Down: {0}'.format(len(fights.kills)))
-        lines.append('Wipes: {0} total'.format(len(fights.fights) - len(fights.kills)))
-        lines.append('')
-        lines.append('TONIGHT\'S TOP FIGHT:')
-        lines.append(get_top_fight_string(df))
-        lines.append('')
-        lines.append('TOP ILVL DPS PERFORMANCES:')
-        lines += get_top_ilvl_dps_performances(df)
-        lines.append('')
-        lines.append('TOP SPEC-WIDE DPS PERFORMANCES:')
-        lines += get_top_overall_dps_performances(df)
-        lines.append('')
-        lines.append('BEST HPS (SINGLE FIGHT):')
-        lines += get_top_hps(df)
-        lines.append('```')
+    filename = join(getcwd(), PARENT_OUT_FOLDER, REPORT_FOLDER, report.id_string + '.txt')
+    if not isfile(filename):
+        with open(filename, 'w') as open_file:
+            lines = []
+            lines.append('```')
+            lines.append('{0} {1} {2}'.format(fights.difficulty, report.zone_name, format_date(report.start_time_epoch_millis)))
+            lines.append('============================================')
+            lines.append('Raid Duration: {0}'.format(report.get_formatted_duration()))
+            lines.append('Bosses Down: {0}'.format(len(fights.kills)))
+            lines.append('Wipes: {0} total'.format(len(fights.fights) - len(fights.kills)))
+            lines.append('')
+            lines.append('TONIGHT\'S TOP FIGHT:')
+            lines.append(get_top_fight_string(df))
+            lines.append('')
+            lines.append('TOP ILVL DPS PERFORMANCES:')
+            lines += get_top_ilvl_dps_performances(df)
+            lines.append('')
+            lines.append('TOP SPEC-WIDE DPS PERFORMANCES:')
+            lines += get_top_overall_dps_performances(df)
+            lines.append('')
+            lines.append('BEST HPS (SINGLE FIGHT):')
+            lines += get_top_hps(df)
+            lines.append('```')
 
-        open_file.writelines(line + '\n' for line in lines)
+            open_file.writelines(line + '\n' for line in lines)
 
     with open(filename) as open_file:
         text = open_file.read()

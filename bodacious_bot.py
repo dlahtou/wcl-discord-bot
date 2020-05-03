@@ -25,11 +25,10 @@ async def on_message(message):
             await message.channel.send('Hello!')
     elif message.content.startswith('/dadjoke'):
         await message.channel.send(get_dad_joke())
+    elif message.content.startswith('/roll'):
+        print('Rolling!')
+        await message.channel.send(roll())
     else:
         print('Invalid message, no response sent')
-
-
-    if message.content.startswith('/roll'):
-        await message.channel.send(roll())
 
 client.run(DISCORD_BOT_TOKEN)

@@ -2,6 +2,7 @@ import discord
 from dad_jokes.dad_jokes import get_dad_joke
 from roll.roll import roll
 from wcl_api.wcl_reporter import report
+from pick.pick import pick
 from properties import DISCORD_BOT_TOKEN
 
 client = discord.Client()
@@ -31,6 +32,8 @@ async def on_message(message):
         await message.channel.send(roll())
     elif message.content.startswith('/raidreport'):
         await message.channel.send(report())
+    elif message.content.startswith('/pick'):
+        await message.channel.send(pick(message.content))
     else:
         print('Invalid message, no response sent')
 

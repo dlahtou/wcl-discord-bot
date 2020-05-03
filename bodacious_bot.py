@@ -1,5 +1,6 @@
 import discord
 from dad_jokes.dad_jokes import get_dad_joke
+from roll.roll import roll
 from properties import DISCORD_BOT_TOKEN
 
 client = discord.Client()
@@ -22,5 +23,8 @@ async def on_message(message):
 
     if message.content.startswith('$dad_joke'):
         await message.channel.send(get_dad_joke().text)
+
+    if message.content.startswith('/roll'):
+        await message.channel.send(roll())
 
 client.run(DISCORD_BOT_TOKEN)

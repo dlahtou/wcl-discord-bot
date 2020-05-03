@@ -1,4 +1,4 @@
 from random import random
 
 def roll():
-    return randint(1, 100)
+    return random.randint(1, 100)

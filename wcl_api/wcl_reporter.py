@@ -8,7 +8,7 @@ PARENT_OUT_FOLDER = 'DudesLogs'
 REPORT_FOLDER = 'reports'
 
 def get_report_dataframe(report, fights):
-    filename = join(getcwd(), OUT_FOLDER_NAME, report.get_id_string() + '.csv')
+    filename = join(getcwd(), PARENT_OUT_FOLDER, report.get_id_string() + '.csv')
 
     df = None
     if isfile(filename):

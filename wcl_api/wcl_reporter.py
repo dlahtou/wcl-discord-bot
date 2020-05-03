@@ -1,6 +1,6 @@
 from wcl_api import wcl_api, models, scraper
-from os.path import join, isfile
-from os import getcwd, remove
+from os.path import join, isfile, isdir
+from os import getcwd, mkdir
 import pandas as pd
 from datetime import date
 
@@ -60,10 +60,17 @@ def build_report(report, fights, df):
 def report():
     report = models.Report(wcl_api.get_newest_report_json('My Dudes', 'tichondrius', 'us'))
     fights = models.Fights(wcl_api.get_fights_json(report))
+    prep_folders()
     df = get_report_dataframe(report, fights)
 
     return build_report(report, fights, df)
 
+
+def prep_folders():
+    if not isdir(PARENT_OUT_FOLDER):
+        mkdir(PARENT_OUT_FOLDER)
+    if not isdir(join(PARENT_OUT_FOLDER, REPORT_FOLDER)):
+        mkdir(join(PARENT_OUT_FOLDER, REPORT_FOLDER))
 
 def format_date(start_time_epoch_millis):
     return date.fromtimestamp(start_time_epoch_millis//1000).strftime("%A %m/%d/%y")

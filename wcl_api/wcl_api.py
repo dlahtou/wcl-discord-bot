@@ -5,10 +5,15 @@ from properties import WARCRAFTLOGS_API_KEY
 WARCRAFTLOGS_API_PATH = 'https://www.warcraftlogs.com:443/v1'
 GUILD_PATH = WARCRAFTLOGS_API_PATH + '/reports/guild/{0}/{1}/{2}?api_key={3}'
 FIGHTS_PATH = WARCRAFTLOGS_API_PATH + '/report/fights/{0}?api_key={1}'
+VALID_RAID_ZONES = [24]
 
 
 def get_newest_report_json(guild_name, server_name, server_region):
     reports = get_reports_json(guild_name, server_name, server_region)
+
+    # filter to raid reports only
+    reports = [report for report in reports if (report['zone'] in VALID_RAID_ZONES)]
+
     if len(reports) > 0:
         return reports[0]
     else:

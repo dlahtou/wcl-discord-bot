@@ -1,8 +1,11 @@
 from wcl_api import wcl_api, models, scraper
+from wcl_api import raider_io_api
 from os.path import join, isfile, isdir
 from os import getcwd, mkdir
 import pandas as pd
 from datetime import date
+from discord import Embed, Colour
+import json
 
 PARENT_OUT_FOLDER = 'DudesLogs'
 REPORT_FOLDER = 'reports'
@@ -25,45 +28,51 @@ def get_report_dataframe(report, fights):
 
     return df
 
-def build_report(report, fights, df):
-    filename = join(getcwd(), PARENT_OUT_FOLDER, REPORT_FOLDER, report.id_string + '.txt')
+def build_report(report, fights, df, raider_io_rankings):
+    filename = join(getcwd(), PARENT_OUT_FOLDER, REPORT_FOLDER, report.id_string + '.json')
     if not isfile(filename):
-        with open(filename, 'w') as open_file:
-            lines = []
-            lines.append('```')
-            lines.append('{0} {1} {2}'.format(fights.difficulty, report.zone_name, format_date(report.start_time_epoch_millis)))
-            lines.append('============================================')
-            lines.append('Raid Duration: {0}'.format(report.get_formatted_duration()))
-            lines.append('Bosses Down: {0}'.format(len(fights.kills)))
-            lines.append('Wipes: {0} total'.format(len(fights.fights) - len(fights.kills)))
-            lines.append('')
-            lines.append('TONIGHT\'S TOP FIGHT:')
-            lines.append(get_top_fight_string(df))
-            lines.append('')
-            lines.append('TOP ILVL DPS PERFORMANCES:')
-            lines += get_top_ilvl_dps_performances(df)
-            lines.append('')
-            lines.append('TOP SPEC-WIDE DPS PERFORMANCES:')
-            lines += get_top_overall_dps_performances(df)
-            lines.append('')
-            lines.append('BEST HPS (SINGLE FIGHT):')
-            lines += get_top_hps(df)
-            lines.append('```')
+        embed = Embed()
+        embed.title = 'My Dudes {0} {1} ({2})'.format(fights.difficulty, report.zone_name, format_date(report.start_time_epoch_millis))
+        embed.color = Colour.gold()
+        embed.set_thumbnail(url=report.zone_thumb)
+        embed.description = '[View on Warcraft Logs]({0})'.format(report.url)
+        embed.add_field(name='Raid Duration', value=report.get_formatted_duration())
+        embed.add_field(name='Bosses Down', value=len(fights.kills))
+        embed.add_field(name='Wipes', value=(len(fights.fights) - len(fights.kills)))
+        embed.add_field(name='Top Fight', value=get_top_fight_string(df), inline=False)
+        embed.add_field(name='Top DPS', value=get_best_ilvl_performer(df), inline=False)
 
-            open_file.writelines(line + '\n' for line in lines)
+        embed.add_field(name='ilvl DPS', value='\n'.join([x.split(' -- ')[0] for x in get_top_ilvl_dps_performances(df)]), inline=True)
+        embed.add_field(name='\u200b', value='\n'.join([x.split(' -- ')[1] for x in get_top_ilvl_dps_performances(df)]), inline=True)
+        embed.add_field(name='\u200b', value='\u200b', inline=True)
+
+        embed.add_field(name='Spec-wide DPS', value='\n'.join([x.split(' -- ')[0] for x in get_top_overall_dps_performances(df)]), inline=True)
+        embed.add_field(name='\u200b', value='\n'.join([x.split(' -- ')[1] for x in get_top_overall_dps_performances(df)]), inline=True)
+        embed.add_field(name='\u200b', value='\u200b', inline=True)
+
+        embed.add_field(name='HPS', value='\n'.join([x.split(' -- ')[0] for x in get_top_hps(df)]), inline=True)
+        embed.add_field(name='\u200b', value='\n'.join([x.split(' -- ')[1] for x in get_top_hps(df)]), inline=True)
+        embed.add_field(name='\u200b', value='\u200b', inline=True)
+
+        embed.set_footer(text=build_footer_text(report, raider_io_rankings))
+
+        print('Writing new report embed to file...')
+        with open(filename, 'w') as open_file:
+            open_file.write(json.dumps(embed.to_dict()))
 
     with open(filename) as open_file:
-        text = open_file.read()
-    
-    return text
+        print('Returning embed from file...')
+        return Embed.from_dict(json.load(open_file))
+
 
 def report():
     report = models.Report(wcl_api.get_newest_report_json('My Dudes', 'tichondrius', 'us'))
     fights = models.Fights(wcl_api.get_fights_json(report))
     prep_folders()
     df = get_report_dataframe(report, fights)
+    raider_io_rankings = models.Raider_IO(raider_io_api.get_rankings_json('My Dudes', 'tichondrius', 'us'), raider_io_api.get_progression_json('My Dudes', 'tichondrius', 'us'))
 
-    return build_report(report, fights, df)
+    return build_report(report, fights, df, raider_io_rankings)
 
 
 def prep_folders():
@@ -89,7 +98,7 @@ def get_top_fight_string(df):
     difficulty = averaged_parses_series.idxmax()[0]
     boss_name = averaged_parses_series.idxmax()[1]
     average_parse = averaged_parses_series.max()
-    return '{0} {1}: {2} raid average ilvl parse'.format(difficulty[0], boss_name, average_parse)
+    return '**{0} {1}**: {2} raid average ilvl parse'.format(difficulty[0], boss_name, average_parse)
 
 
 def get_top_ilvl_dps_performances(df):
@@ -145,9 +154,31 @@ def parse_performance_line(parse_row, i, percentile_type):
     difficulty = parse_row['difficulty'][0]
     boss_name = parse_row['boss_name']
 
-    return '{0}.) ({1}) {2:<12} -- {3} ({4} {5})'.format(i, percentile, character_name, per_second_string, difficulty, boss_name)
+    return '({1}) **{2}** -- {3} ({4} {5})'.format(i, percentile, character_name, per_second_string, difficulty, boss_name)
+
+def get_best_ilvl_performer(df):
+    num_rows = 10
+    damage_parses = get_damage_only_dataframe(df)
+
+    averaged_parses_series = damage_parses.groupby(['character_name'])['overall_parse_percentile'].mean()
+    character_name = averaged_parses_series.idxmax()
+    average_parse = averaged_parses_series.max()
+
+    return '**{0}**: {1:.2f} average overall parse'.format(character_name, average_parse)
 
 
+def build_footer_text(report, rio):
+    rankings_json = rio.raid_rankings
+    normal_rankings = models.Ranking(rankings_json, report.zone_number, 'normal')
+    heroic_rankings = models.Ranking(rankings_json, report.zone_number, 'heroic')
+    mythic_rankings = models.Ranking(rankings_json, report.zone_number, 'mythic')
+    progression = models.Progression(rio.raid_progression, report.zone_number)
+    footer_text = ['Rankings for {0} ({1}-{2}) via Raider.IO:'.format(rio.guild_name, rio.region.upper(), rio.realm)]
+    if normal_rankings.realm > 0:
+        footer_text.append('Normal Difficulty ({0}): #{1} World (#{2} Realm)'.format(progression.normal_string, normal_rankings.world, normal_rankings.realm))
+    if heroic_rankings.realm > 0:
+        footer_text.append('Heroic Difficulty ({0}): #{1} World (#{2} Realm)'.format(progression.heroic_string, heroic_rankings.world, heroic_rankings.realm))
+    if mythic_rankings.realm > 0:
+        footer_text.append('Mythic Difficulty ({0}): #{1} World (#{2} Realm)'.format(progression.mythic_string, mythic_rankings.world, mythic_rankings.realm))
 
-
-
+    return '\n'.join(footer_text)

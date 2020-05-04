@@ -6,6 +6,14 @@ zones_dict = {
     24: "Ny'alotha"
 }
 
+thumbs_by_zone = {
+    24: 'https://dmszsuqyoe6y6.cloudfront.net/img/warcraft/zones/zone-24.png'
+}
+
+raider_io_zones_dict = {
+    24: 'nyalotha-the-waking-city'
+}
+
 role_dict = {
     'Blood': 'tank',
     'Frost': 'damage',
@@ -95,6 +103,8 @@ class Report:
         self.end_time_epoch_millis = wcl_json['end']
         self.zone_number = wcl_json['zone']
         self.zone_name = zones_dict[self.zone_number]
+        self.zone_thumb = thumbs_by_zone[self.zone_number] if self.zone_number in thumbs_by_zone.keys() else ''
+        self.url = 'https://www.warcraftlogs.com/reports/{0}'.format(self.id_string)
     
     def get_zone_number(self):
         return self.zone_number
@@ -159,3 +169,33 @@ class Parse:
             'ilvl_parse_rarity': self.ilvl_parse_rarity,
             'ilvl_parse_percentile': self.ilvl_parse_percentile
         }
+
+class Raider_IO:
+    def __init__(self, raider_io_rankings_json, raider_io_progression_json):
+        self.guild_name = raider_io_rankings_json['name']
+        self.faction = raider_io_rankings_json['faction']
+        self.region = raider_io_rankings_json['region']
+        self.realm = raider_io_rankings_json['realm']
+        self.profile_url = raider_io_rankings_json['profile_url']
+        self.raid_rankings = raider_io_rankings_json['raid_rankings']
+        self.raid_progression = raider_io_progression_json['raid_progression']
+
+
+class Ranking:
+    def __init__(self, parent_json, zone_id, difficulty):
+        json = parent_json[raider_io_zones_dict[zone_id]][difficulty]
+        self.world = json['world']
+        self.region = json['region']
+        self.realm = json['realm']
+
+
+class Progression:
+    def __init__(self, parent_json, zone_id):
+        json = parent_json[raider_io_zones_dict[zone_id]]
+        self.num_bosses = json['total_bosses']
+        self.normal_int = json['normal_bosses_killed']
+        self.heroic_int = json['heroic_bosses_killed']
+        self.mythic_int = json['mythic_bosses_killed']
+        self.normal_string = '{0}/{1}'.format(self.normal_int, self.num_bosses)
+        self.heroic_string = '{0}/{1}'.format(self.heroic_int, self.num_bosses)
+        self.mythic_string = '{0}/{1}'.format(self.mythic_int, self.num_bosses)

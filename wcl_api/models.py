@@ -75,7 +75,7 @@ class Fights:
 
         self.kills = []
         for fight in self.fights:
-            if fight['kill'] == True:
+            if fight['boss'] != 0 and fight['kill'] == True:
                 self.kills.append(fight)
 
     def get_kill_ids(self):

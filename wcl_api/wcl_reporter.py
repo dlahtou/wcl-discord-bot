@@ -102,7 +102,7 @@ def get_top_fight_string(df):
     difficulty = averaged_parses_series.idxmax()[0]
     boss_name = averaged_parses_series.idxmax()[1]
     average_parse = averaged_parses_series.max()
-    return '**{0} {1}**: {2} raid average ilvl parse'.format(difficulty[0], boss_name, average_parse)
+    return '**{0} {1}**: {2:.2f} raid average ilvl parse'.format(difficulty[0], boss_name, average_parse)
 
 
 def get_top_ilvl_dps_performances(df):

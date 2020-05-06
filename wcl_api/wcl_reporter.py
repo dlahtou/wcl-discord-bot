@@ -68,6 +68,10 @@ def build_report(report, fights, df, raider_io_rankings):
 def report():
     report = models.Report(wcl_api.get_newest_report_json('My Dudes', 'tichondrius', 'us'))
     fights = models.Fights(wcl_api.get_fights_json(report))
+
+    if len(fights.kills) == 0:
+        return "No boss kills found for report: {}".format(report.url)
+
     prep_folders()
     df = get_report_dataframe(report, fights)
     raider_io_rankings = models.Raider_IO(raider_io_api.get_rankings_json('My Dudes', 'tichondrius', 'us'), raider_io_api.get_progression_json('My Dudes', 'tichondrius', 'us'))

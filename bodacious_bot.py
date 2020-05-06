@@ -32,7 +32,11 @@ async def on_message(message):
         print('Rolling!')
         await message.channel.send(roll())
     elif message.content.startswith('/raidreport'):
-        await message.channel.send(embed=report())
+        raidreport = report()
+        if type(raidreport) == str:
+            await message.channel.send(raidreport)
+        else:
+            await message.channel.send(embed=raidreport)
     elif message.content.startswith('/pick'):
         await message.channel.send(pick(message.content))
     elif message.content.startswith('/help'):

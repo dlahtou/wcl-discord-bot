@@ -142,7 +142,7 @@ class Parse:
         
         overall_parse_a = row.find_element(By.CSS_SELECTOR, '.main-table-performance.rank > a')
         self.overall_parse_rarity = overall_parse_a.get_attribute('class')
-        self.overall_parse_percentile = parse_int_else_zero(overall_parse_a.get_attribute('innerHTML'))
+        self.overall_parse_percentile = parse_int_else_zero(overall_parse_a.get_attribute('textContent'))
         
         self.character_name = row.find_element(By.CSS_SELECTOR, '.main-table-name.report-table-name a').get_attribute('innerHTML').strip()
         self.total = parse_int_else_zero(row.find_element(By.CSS_SELECTOR, '.report-table-amount.main-table-amount span').get_attribute('innerHTML'))
@@ -150,7 +150,7 @@ class Parse:
         
         ilvl_parse_a = row.find_element(By.CSS_SELECTOR, '.main-table-ilvl-performance.rank > a')
         self.ilvl_parse_rarity = ilvl_parse_a.get_attribute('class')
-        self.ilvl_parse_percentile = parse_int_else_zero(ilvl_parse_a.get_attribute('innerHTML'))
+        self.ilvl_parse_percentile = parse_int_else_zero(ilvl_parse_a.get_attribute('textContent'))
 
     def to_dict(self):
         return {
